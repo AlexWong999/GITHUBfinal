@@ -1,0 +1,40 @@
+import numpy as np
+
+# User-item matrix representing user ratings
+user_item_matrix = np.array([[4, 5, 0, 3, 0],
+                            [5, 0, 4, 0, 2],
+                            [0, 3, 0, 4, 0],
+                            [2, 0, 3, 0, 5]])
+
+# Function to calculate similarity between two users using cosine similarity
+def calculate_similarity(user1, user2):
+    user1_ratings = user_item_matrix[user1]
+    user2_ratings = user_item_matrix[user2]
+    dot_product = np.dot(user1_ratings, user2_ratings)
+    norm_user1 = np.linalg.norm(user1_ratings)
+    norm_user2 = np.linalg.norm(user2_ratings)
+    similarity = dot_product / (norm_user1 * norm_user2)
+    return similarity
+
+# Function to recommend items to a user
+def recommend_items(user):
+    num_users = user_item_matrix.shape[0]
+    item_ratings = np.zeros(user_item_matrix.shape[1])
+    
+    for i in range(num_users):
+        if i == user:
+            continue
+        similarity = calculate_similarity(user, i)
+        item_ratings += similarity * user_item_matrix[i]
+    
+    sorted_indices = np.argsort(item_ratings)[::-1]
+    recommended_items = [i for i in sorted_indices if user_item_matrix[user][i] == 0]
+    return recommended_items
+
+# Main code
+user_id = 0
+recommendations = recommend_items(user_id)
+print("Recommended items for User", user_id, ":")
+for item_id in recommendations:
+    print("Item", item_id)
+
